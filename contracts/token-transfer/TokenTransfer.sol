@@ -18,11 +18,11 @@ contract TokenTransfer {
     // ERC Token Contract Address
     address public ercToken;
 
-    // Point Token Contract Address
-    address public pointToken;
+    // Internal Token Contract Address
+    address public internalCirculationToken;
 
     // History Dapps Address
-    address public historyDapps;
+    address public transferHistory;
 
     // Exchange rate to ERC token
     uint256 public exchangeLateToERCToken = 1;
@@ -38,13 +38,13 @@ contract TokenTransfer {
     // ---------------------------------------------
     // Constructor
     // ---------------------------------------------
-    constructor(address _ercToken, address _pointToken, address _historyDapps) public {
+    constructor(address _ercToken, address _internalCirculationToken, address _transferHistory) public {
         // The owner address is maintained.
         owner = msg.sender;
 
         ercToken = _ercToken;
-        pointToken = _pointToken;
-        historyDapps = _historyDapps;
+        internalCirculationToken = _internalCirculationToken;
+        transferHistory = _transferHistory;
 
     }
 
@@ -81,7 +81,7 @@ contract TokenTransfer {
     function transferToken(bytes _signature, address _to, uint256 _value, string _nonce) external onlyOwner returns (bool success) {
         // Verify signature
         // Recalculate hash value
-        bytes32 hashedTx = InternalCirculationTokenInterface(pointToken).requestTokenTransfer(_to, _value, _nonce);
+        bytes32 hashedTx = InternalCirculationTokenInterface(internalCirculationToken).requestTokenTransfer(_to, _value, _nonce);
 
         // Identify the requester's ETH Address
         address _user = hashedTx.recover(_signature);
@@ -95,7 +95,7 @@ contract TokenTransfer {
         require(_user == _to);
 
         // Not being transferred
-        require(TransferHistoryInterface(historyDapps).isTokenTransferred(_signature) == false);
+        require(TransferHistoryInterface(transferHistory).isTokenTransferred(_signature) == false);
 
         // InternalCirculationTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
@@ -104,10 +104,17 @@ contract TokenTransfer {
 
         // record
         if (success) {
-            TransferHistoryInterface(historyDapps).recordAsTokenTransferred(_signature);
+            TransferHistoryInterface(transferHistory).recordAsTokenTransferred(_signature);
         }
         return success;
 
+    }
+
+    // @title Send all tokens to the owner
+    function withdraw() external onlyOwner returns (bool success) {
+        uint256 balance = ERC20Basic(ercToken).balanceOf(address(this));
+        success = ERC20Basic(ercToken).transfer(owner, balance);
+        return success;
     }
 
     // ---------------------------------------------
