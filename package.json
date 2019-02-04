@@ -1,0 +1,22 @@
+{
+  "name": "token-transfer",
+  "version": "0.1.0",
+  "description": "Implementation for exchanging from ``internal circulation token'' to ERC20/223 token",
+  "private": true,
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mermaid": "^8.0.0",
+    "mermaid.cli": "^0.5.1",
+    "truffle-hdwallet-provider": "^1.0.2",
+    "zeppelin-solidity": "^1.12.0"
+  }
+}

@@ -1,0 +1,27 @@
+sequenceDiagram
+Title: ERC20/223トークン支払いの処理
+participant Web3 AS イベントリスナー
+participant TransferDapps AS トークン支払いÐApps
+participant PointToken AS 内部流通トークン
+participant HistoryDapps AS 交換履歴記録ÐApps
+participant ERCToken AS ERCトークン
+participant User AS ユーザー
+
+Web3->>+TransferDapps: 支払い実行
+
+    TransferDapps->>+PointToken: 内部流通トークンでの送金情報の妥当性の確認
+    PointToken-->>-TransferDapps: 応答
+
+    TransferDapps->>+HistoryDapps: 支払い済みではないことを確認
+    HistoryDapps-->>-TransferDapps: 応答
+
+    TransferDapps->>TransferDapps: 送金するERCトークン数を計算
+
+    TransferDapps->>+ERCToken: トークンの配布
+    ERCToken-->>User: emit Transfer()
+    ERCToken-->>-TransferDapps: 応答
+
+    TransferDapps->>+HistoryDapps: 支払い済みであることを記録
+    HistoryDapps-->>-TransferDapps: 応答
+
+TransferDapps-->>-Web3: 処理結果
