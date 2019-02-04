@@ -24,7 +24,7 @@ contract TokenTransfer {
     // History Dapps Address
     address public historyDapps;
 
-    // ERCトークンへの交換レート
+    // Exchange rate to ERC token
     uint256 public exchangeLateToERCToken = 1;
 
     // ---------------------------------------------
@@ -48,13 +48,11 @@ contract TokenTransfer {
 
     }
 
-    // ERC223向けのinterface
-
+    // for ERC223
     struct TKN {
         address sender;
         uint256 value;
         bytes data;
-        //        bytes4 sig;
     }
 
     // @dev Standard ERC223 function that will handle incoming token transfers.
@@ -62,35 +60,26 @@ contract TokenTransfer {
     // @params _value Amount of tokens.
     // @params _data  Transaction metadata.
     function tokenFallback(address _from, uint256 _value, bytes _data) external returns (bool) {
-        // 指定のERC223トークン以外は受け取らない
-        //        require(msg.sender == ercToken);
+        // TokenTransfer receives only the specified ERC223 token
+        require(msg.sender == ercToken);
 
         TKN memory tkn;
         tkn.sender = _from;
         tkn.value = _value;
         tkn.data = _data;
-        //        uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
-        //        tkn.sig = bytes4(u);
 
-        /* tkn variable is analogue of msg variable of Ether transaction
-        *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
-        *  tkn.value the number of tokens that were sent   (analogue of msg.value)
-        *  tkn.data is data of token transaction   (analogue of msg.data)
-        *  tkn.sig is 4 bytes signature of function
-        *  if data of token transaction is a function execution
-        */
+        // Response to ERC 223
         return true;
 
     }
 
-    // @title ERCトークンを支払う
-    // @params _signature
-    // @params _to
-    // @params _value
-    // @params _nonce
+    // @title Send an ERC token
+    // @params _signature Signature at the time of exchange request
+    // @params _to        Requester
+    // @params _value     Amount of exchange (Internal Circulation Token)
+    // @params _nonce     Nonce at the time of exchange
     function transferToken(bytes _signature, address _to, uint256 _value, string _nonce) external onlyOwner returns (bool success) {
-        /// 署名の妥当性を検証
-
+        // Verify signature
         // Recalculate hash value
         bytes32 hashedTx = InternalCirculationTokenInterface(pointToken).requestTokenTransfer(_to, _value, _nonce);
 
@@ -105,19 +94,15 @@ contract TokenTransfer {
         // If they are different, it is judged that the user's request has not been transmitted correctly
         require(_user == _to);
 
-        // 支払済みではないことを確認
+        // Not being transferred
         require(TransferHistoryInterface(historyDapps).isTokenTransferred(_signature) == false);
 
-        // InternalCirculationTokenInterface -> ERCToken換算
+        // InternalCirculationTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
-
-        // ToDo イベント通知するか否か？
 
         success = ERC20Basic(ercToken).transfer(_to, ercTokenValue);
 
-        // トークンを配布
-
-        // 支払いを記録
+        // record
         if (success) {
             TransferHistoryInterface(historyDapps).recordAsTokenTransferred(_signature);
         }
