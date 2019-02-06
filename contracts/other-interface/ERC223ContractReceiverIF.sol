@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21<0.6.0;
+pragma solidity >=0.4.24<0.6.0;
 
 /* https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/Receiver_Interface.sol */
 interface ERC223ContractReceiverIF {
