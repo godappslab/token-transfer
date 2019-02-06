@@ -38,6 +38,8 @@ interface TransferHistoryInterface {
 
 ![ERC20/223トークン支払いの処理](./docs/sequence-diagram/token-transfer.svg)
 
+<img src="./docs/flowchart/token-transfer.svg" alt="ERC20/223トークン支払いの処理">
+
 ## Test Cases
 
 [Truffle Suite ](https://truffleframework.com/) を利用したテストスクリプトで動作確認を行う。
