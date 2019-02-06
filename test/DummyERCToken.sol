@@ -13,13 +13,10 @@ contract DummyERCToken {
     function transfer(address _to, uint256 _value) external returns (bool success) {
         to = _to;
         value = _value;
-
         if (_dummyAnswer == false) {
-            revert();
+            revert("transfer failed");
         }
-
         return _dummyAnswer;
-
     }
 
     function setDummyAnswer(bool _newAnswer) public {
