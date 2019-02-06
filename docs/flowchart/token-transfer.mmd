@@ -1,5 +1,4 @@
 graph TD
-Title: ERC20/223トークン支払いの処理
 start(支払い要求)
 start --> 要求チェック{妥当な支払い要求要求?}
 要求チェック -->|No| revert["revert()"]
