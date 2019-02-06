@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21<0.6.0;
+pragma solidity >=0.4.24<0.6.0;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
@@ -59,7 +59,7 @@ contract TokenTransfer {
     // @params _from  Token sender address.
     // @params _value Amount of tokens.
     // @params _data  Transaction metadata.
-    function tokenFallback(address _from, uint256 _value, bytes _data) external returns (bool) {
+    function tokenFallback(address _from, uint256 _value, bytes _data) external view returns (bool) {
         // TokenTransfer receives only the specified ERC223 token
         require(msg.sender == ercToken);
 
@@ -86,16 +86,16 @@ contract TokenTransfer {
         // Identify the requester's ETH Address
         address _user = hashedTx.recover(_signature);
 
-        require(_user != address(0));
+        require(_user != address(0), "Unable to get address from signature");
 
         // the argument `_to` and
         // the value obtained by calculation from the signature are the same ETH address
         //
         // If they are different, it is judged that the user's request has not been transmitted correctly
-        require(_user == _to);
+        require(_user == _to, "Mismatch with address obtained from signature");
 
         // Not being transferred
-        require(TransferHistoryInterface(transferHistory).isTokenTransferred(_signature) == false);
+        require(TransferHistoryInterface(transferHistory).isTokenTransferred(_signature) == false, "Already token remitted");
 
         // InternalCirculationTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
