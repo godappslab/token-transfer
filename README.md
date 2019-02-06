@@ -38,7 +38,7 @@ interface TransferHistoryInterface {
 
 ![ERC20/223トークン支払いの処理](./docs/sequence-diagram/token-transfer.svg)
 
-<img src="./docs/flowchart/token-transfer.svg" alt="ERC20/223トークン支払いの処理">
+<img src="./docs/flowchart/token-transfer.svg" width="300" alt="ERC20/223トークン支払いの処理">
 
 ## Test Cases
 
