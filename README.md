@@ -36,7 +36,11 @@ interface TransferHistoryInterface {
 
 **ERC20/223トークン支払いの処理**
 
+Sequence Diagram
+
 ![ERC20/223トークン支払いの処理](./docs/sequence-diagram/token-transfer.svg)
+
+flowchart
 
 <img src="./docs/flowchart/token-transfer.svg" width="300" alt="ERC20/223トークン支払いの処理">
 
@@ -44,7 +48,37 @@ interface TransferHistoryInterface {
 
 [Truffle Suite ](https://truffleframework.com/) を利用したテストスクリプトで動作確認を行う。
 
+```bash
+$ truffle test 
+Using network 'test'.
 
+Compiling ./contracts/token-transfer/TokenTransfer.sol...
+Compiling ./test/DummyERCToken.sol...
+Compiling ./test/DummyInternalCirculationToken.sol...
+ownerAddress: 0x627306090abaB3A6e1400e9345bC60c78a8BEf57
+
+
+  Contract: [TEST] TokenTransfer
+       [LOG] erc_token: 0x8f0483125FCb9aaAEFA9209D8E9d7b9C8B9Fb90F
+       [LOG] point_token: 0x9FBDa871d559710256a2502A2517b794B482Db40
+       [LOG] transfer_history: 0x2C2B9C9a4a25e24B174f26114e8926a9f2128FE4
+       [LOG] tokenTransfer: 0x30753E4A8aad7F8597332E813735Def5dD395028
+    ✓ Deploying Smart Contract (288ms)
+       [LOG] Returned error: VM Exception while processing transaction: revert Mismatch with address obtained from signature -- Reason given: Mismatch with address obtained from signature.
+    ✓ [Different nonces] Mismatch with address obtained from signature (177ms)
+       [LOG] Returned error: VM Exception while processing transaction: revert Mismatch with address obtained from signature -- Reason given: Mismatch with address obtained from signature.
+    ✓ [Different token quantity] Mismatch with address obtained from signature (136ms)
+       [LOG] Returned error: VM Exception while processing transaction: revert Mismatch with address obtained from signature -- Reason given: Mismatch with address obtained from signature.
+    ✓ [Different address] Mismatch with address obtained from signature (120ms)
+       [LOG] Returned error: VM Exception while processing transaction: revert transfer failed -- Reason given: transfer failed.
+    ✓ ERC token transfer failure (151ms)
+    ✓ [The first time] Success (129ms)
+       [LOG] Returned error: VM Exception while processing transaction: revert Already token remitted -- Reason given: Already token remitted.
+    ✓ [Second time fail] Already token remitted (129ms)
+
+
+  7 passing (1s)
+```
 
 ## 実装
 
