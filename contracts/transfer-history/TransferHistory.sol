@@ -32,8 +32,9 @@ contract TransferHistory is TransferHistoryInterface {
         owner = msg.sender;
     }
 
-    // @title
-    // @params _signature
+    // @title Returns whether it is a used signature
+    // @params _signature Signature string
+    // @return bool Used or not
     function isTokenTransferred(bytes _signature) external view returns (bool) {
         return usedSignatures[_signature];
     }
