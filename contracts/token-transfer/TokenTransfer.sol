@@ -80,6 +80,13 @@ contract TokenTransfer {
     // @params _nonce     Nonce at the time of exchange
     function transferToken(bytes _signature, address _to, uint256 _value, string _nonce) external onlyOwner returns (bool success) {
         // Verify signature
+
+        // It must be a used signature in the internal circulation token
+        require(
+            InternalCirculationTokenInterface(internalCirculationToken).isUsedSignature(_signature) == true,
+            "Must be a used signature in the internal circulation token"
+        );
+
         // Recalculate hash value
         bytes32 hashedTx = InternalCirculationTokenInterface(internalCirculationToken).requestTokenTransfer(_to, _value, _nonce);
 
