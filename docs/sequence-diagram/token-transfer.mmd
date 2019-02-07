@@ -1,27 +1,31 @@
 sequenceDiagram
-Title: ERC20/223トークン支払いの処理
-participant Web3 AS イベントリスナー
-participant TransferDapps AS トークン支払いÐApps
-participant PointToken AS 内部流通トークン
-participant HistoryDapps AS 交換履歴記録ÐApps
-participant ERCToken AS ERCトークン
-participant User AS ユーザー
+Title: Process of transferring ERC20/223 Token
+participant Web3 AS Web3 APP
+participant TransferDapps AS TokenTransfer(ÐApps)
+participant PointToken AS InternalCirculationToken
+participant HistoryDapps AS TransferHistory(ÐApps)
+participant ERCToken AS ERC Token
+participant BlockChain AS Ethereum Block Chain
 
-Web3->>+TransferDapps: 支払い実行
+BlockChain-->>Web3: receive Exchange()
 
-    TransferDapps->>+PointToken: 内部流通トークンでの送金情報の妥当性の確認
-    PointToken-->>-TransferDapps: 応答
+Web3->>+TransferDapps: Request transfer of token
 
-    TransferDapps->>+HistoryDapps: 支払い済みではないことを確認
-    HistoryDapps-->>-TransferDapps: 応答
+    TransferDapps->>+PointToken: Is the signature used in internal distribution tokens?
+    PointToken-->>-TransferDapps: reply
 
-    TransferDapps->>TransferDapps: 送金するERCトークン数を計算
+    TransferDapps->>TransferDapps: Validation of information obtained from signatures and parameters
 
-    TransferDapps->>+ERCToken: トークンの配布
-    ERCToken-->>User: emit Transfer()
-    ERCToken-->>-TransferDapps: 応答
+    TransferDapps->>+HistoryDapps: Confirm that it has not been transferred yet
+    HistoryDapps-->>-TransferDapps: reply
 
-    TransferDapps->>+HistoryDapps: 支払い済みであることを記録
-    HistoryDapps-->>-TransferDapps: 応答
+    TransferDapps->>TransferDapps: Calculate the number of ERC tokens
 
-TransferDapps-->>-Web3: 処理結果
+    TransferDapps->>+ERCToken: Transfer a token
+    ERCToken-->>BlockChain: emit Transfer()
+    ERCToken-->>-TransferDapps: reply
+
+    TransferDapps->>+HistoryDapps: Record as transferred
+    HistoryDapps-->>-TransferDapps: reply
+
+TransferDapps-->>-Web3: reply

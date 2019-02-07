@@ -1,20 +1,23 @@
 graph TD
-start(支払い要求)
-start --> 要求チェック{妥当な支払い要求?}
-要求チェック -->|No| revert["revert()"]
-要求チェック -->|Yes| 支払い済みチェック{"既に支払済か？"}
+start(Request transfer of token) --> InternalDdistributionTokens["Is the signature used in internal distribution tokens?"]
 
-支払い済みチェック -->|Yes| revert
-支払い済みチェック -->|No| 換算[支払うトークンを計算]
+InternalDdistributionTokens -->|No| revert["revert()"]
+InternalDdistributionTokens -->|Yes| SelfCheck["Is the information derived from the signature and parameters valid?"]
 
-換算 --> 送金[トークンをユーザーへ送金する]
-送金 --> 送金成否{"送金できたか？"}
+SelfCheck -->|No| revert["revert()"]
+SelfCheck -->|Yes| History["Already transferred?"]
 
-送金成否 -->|失敗| revert
-送金成否 -->|成功| 支払記録[支払い済みの記録]
+History -->|Yes| revert
+History -->|No| Calculation["Calculate the number of ERC tokens"]
 
-支払記録 --> 記録成否{成否}
+Calculation --> ERCToken[Transfer a token]
+ERCToken --> TransferSucceed["Did transfer succeed?"]
 
-記録成否 -->|失敗| revert
-記録成否 -->|成功| finish[処理完了]
+TransferSucceed -->|No| revert
+TransferSucceed -->|Yes| Record["Record as transferred"]
+
+Record --> Successful["Successful?"]
+
+Successful -->|No| revert
+Successful -->|Yes| finish["complete"]
 
