@@ -42,7 +42,7 @@ Sequence Diagram
 
 flowchart
 
-<img src="./docs/flowchart/token-transfer.svg" width="300" alt="ERC20/223トークン支払いの処理">
+<img src="./docs/flowchart/token-transfer.svg" width="600" alt="ERC20/223トークン支払いの処理">
 
 ## Test Cases
 
