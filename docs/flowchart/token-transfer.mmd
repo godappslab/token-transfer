@@ -1,8 +1,8 @@
 graph TD
-start(Request transfer of token) --> InternalDdistributionTokens["Is the signature used in internal distribution tokens?"]
+start(Request transfer of token) --> InternalDistributionToken["Is the signature used in internal distribution tokens?"]
 
-InternalDdistributionTokens -->|No| revert["revert()"]
-InternalDdistributionTokens -->|Yes| SelfCheck["Is the information derived from the signature and parameters valid?"]
+InternalDistributionToken -->|No| revert["revert()"]
+InternalDistributionToken -->|Yes| SelfCheck["Is the information derived from the signature and parameters valid?"]
 
 SelfCheck -->|No| revert["revert()"]
 SelfCheck -->|Yes| History["Already transferred?"]

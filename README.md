@@ -1,10 +1,10 @@
-# Implementation for exchanging from Internal Circulation Token to ERC20/223 Token
+# Implementation for exchanging from Internal Distribution Token to ERC20/223 Token
 
 It is under development.
 
 ## 概要
 
-内部流通トークン - [godappslab/internal\-circulation\-token: Implementation of Internal Circulation Token](https://github.com/godappslab/internal-circulation-token) で、ユーザーがオーナーへ内部流通トークンからERC20/223のトークンへの交換をリクエストしたことを受けて、そのユーザーへあらかじめ指定されたERC20/223トークンを送金するÐAppsの実装
+内部流通トークン - [godappslab/internal\-distribution\-token: Implementation of Internal Distribution Token](https://github.com/godappslab/internal-distribution-token) で、ユーザーがオーナーへ内部流通トークンからERC20/223のトークンへの交換をリクエストしたことを受けて、そのユーザーへあらかじめ指定されたERC20/223トークンを送金するÐAppsの実装
 
 ## 要点
 
