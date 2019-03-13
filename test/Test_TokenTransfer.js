@@ -53,7 +53,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
             assert.fail('Expected throw not received');
         } catch (e) {
             log(e.message);
-            const reverted = e.message.search('Mismatch with address obtained from signature') >= 0;
+            const reverted = e.message.search('VM Exception while processing transaction: revert') >= 0;
             assert.equal(reverted, true);
         }
     });
@@ -71,7 +71,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
             assert.fail('Expected throw not received');
         } catch (e) {
             log(e.message);
-            const reverted = e.message.search('Mismatch with address obtained from signature') >= 0;
+            const reverted = e.message.search('VM Exception while processing transaction: revert') >= 0;
             assert.equal(reverted, true);
         }
     });
@@ -89,7 +89,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
             assert.fail('Expected throw not received');
         } catch (e) {
             log(e.message);
-            const reverted = e.message.search('Mismatch with address obtained from signature') >= 0;
+            const reverted = e.message.search('VM Exception while processing transaction: revert') >= 0;
             assert.equal(reverted, true);
         }
     });
@@ -107,7 +107,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
             assert.fail('Expected throw not received');
         } catch (e) {
             log(e.message);
-            const reverted = e.message.search('transfer failed') >= 0;
+            const reverted = e.message.search('VM Exception while processing transaction: revert') >= 0;
             assert.equal(reverted, true);
         }
 
@@ -140,7 +140,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
             assert.fail('Expected throw not received');
         } catch (e) {
             log(e.message);
-            const reverted = e.message.search('Already token remitted') >= 0;
+            const reverted = e.message.search('VM Exception while processing transaction: revert') >= 0;
             assert.equal(reverted, true);
         }
     });

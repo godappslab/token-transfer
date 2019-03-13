@@ -1,8 +1,8 @@
-pragma solidity >=0.4.24<0.6.0;
+pragma solidity ^0.5.0;
 
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import "zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
-import "zeppelin-solidity/contracts/ECRecovery.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
 import "../transfer-history/TransferHistoryInterface.sol";
 import "../other-interface/InternalCirculationTokenInterface.sol";
@@ -11,7 +11,7 @@ import "../other-interface/ERC223ContractReceiverIF.sol";
 contract TokenTransfer {
     // Load library
     using SafeMath for uint256;
-    using ECRecovery for bytes32;
+    using ECDSA for bytes32;
 
     address public owner;
 
@@ -59,7 +59,7 @@ contract TokenTransfer {
     // @params _from  Token sender address.
     // @params _value Amount of tokens.
     // @params _data  Transaction metadata.
-    function tokenFallback(address _from, uint256 _value, bytes _data) external view returns (bool) {
+    function tokenFallback(address _from, uint256 _value, bytes calldata _data) external view returns (bool) {
         // TokenTransfer receives only the specified ERC223 token
         require(msg.sender == ercToken);
 
@@ -78,7 +78,7 @@ contract TokenTransfer {
     // @params _to        Requester
     // @params _value     Amount of exchange (Internal Circulation Token)
     // @params _nonce     Nonce at the time of exchange
-    function transferToken(bytes _signature, address _to, uint256 _value, string _nonce) external onlyOwner returns (bool success) {
+    function transferToken(bytes calldata _signature, address _to, uint256 _value, string calldata _nonce) external onlyOwner returns (bool success) {
         // Verify signature
 
         // It must be a used signature in the internal circulation token
@@ -107,7 +107,7 @@ contract TokenTransfer {
         // InternalCirculationTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
 
-        success = ERC20Basic(ercToken).transfer(_to, ercTokenValue);
+        success = IERC20(ercToken).transfer(_to, ercTokenValue);
 
         // record
         if (success) {
@@ -119,16 +119,9 @@ contract TokenTransfer {
 
     // @title Send all tokens to the owner
     function withdraw() external onlyOwner returns (bool success) {
-        uint256 balance = ERC20Basic(ercToken).balanceOf(address(this));
-        success = ERC20Basic(ercToken).transfer(owner, balance);
+        uint256 balance = IERC20(ercToken).balanceOf(address(this));
+        success = IERC20(ercToken).transfer(owner, balance);
         return success;
-    }
-
-    // ---------------------------------------------
-    // Destruction of a contract (only owner)
-    // ---------------------------------------------
-    function destory() public onlyOwner {
-        selfdestruct(owner);
     }
 
 }
