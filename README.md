@@ -2,9 +2,15 @@
 
 It is under development.
 
+このリポジトリのソースコードは、現在開発段階のものです。
+
 ## 概要
 
-内部流通トークン - [godappslab/internal\-distribution\-token: Implementation of Internal Distribution Token](https://github.com/godappslab/internal-distribution-token) で、ユーザーがオーナーへ内部流通トークンからERC20/223のトークンへの交換をリクエストしたことを受けて、そのユーザーへあらかじめ指定されたERC20/223トークンを送金するÐAppsの実装
+これは、『内部流通トークン』のユーザーがオーナーへ内部流通トークンからERC20/223のトークンへの交換の際の Exchange イベントをトリガーとして指定の ERC20/223トークンを送金するÐAppsの実装です。
+
+- 内部流通トークン - [godappslab/internal\-distribution\-token: Implementation of Internal Distribution Token](https://github.com/godappslab/internal-distribution-token)
+
+イベントを受け取る部分、および、イベント内の情報をもとに "TokenTransfer" ÐAppsを実行する部分は Web3.js を使用したウェブモジュールによって実行します。
 
 ## 要点
 
@@ -25,11 +31,11 @@ It is under development.
 アドレスの登録はオーナーが `updateTransferDappsAddress()` 関数を実行することにより設定できる。
 
 ```solidity
-pragma solidity >=0.4.21<0.6.0;
+pragma solidity ^0.5.0;
 
 interface TransferHistoryInterface {
-    function isTokenTransferred(bytes _signature) external view returns (bool);
-    function recordAsTokenTransferred(bytes _signature) external returns (bool);
+    function isTokenTransferred(bytes calldata _signature) external view returns (bool);
+    function recordAsTokenTransferred(bytes calldata _signature) external returns (bool);
     function updateTransferDappsAddress(address _newTransferDapps) external returns (bool);
 }
 ```
@@ -85,6 +91,3 @@ ownerAddress: 0x627306090abaB3A6e1400e9345bC60c78a8BEf57
 このÐAppsの実装はGitHubにて公開する。
 
 https://github.com/godappslab/token-transfer
-
-## 参考文献
-
