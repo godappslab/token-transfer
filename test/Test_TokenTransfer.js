@@ -1,7 +1,7 @@
 const TransferHistory = artifacts.require('TransferHistory');
 const TokenTransfer = artifacts.require('TokenTransfer');
 
-const DummyInternalCirculationToken = artifacts.require('./DummyInternalCirculationToken.sol');
+const DummyInternalDistributionToken = artifacts.require('./DummyInternalDistributionToken.sol');
 const DummyERCToken = artifacts.require('./DummyERCToken.sol');
 
 contract('[TEST] TokenTransfer', async (accounts) => {
@@ -26,7 +26,7 @@ contract('[TEST] TokenTransfer', async (accounts) => {
 
     it('Deploying Smart Contract', async () => {
         erc_token = await DummyERCToken.new();
-        point_token = await DummyInternalCirculationToken.new();
+        point_token = await DummyInternalDistributionToken.new();
         transfer_history = await TransferHistory.new();
 
         log('erc_token:', erc_token.address);

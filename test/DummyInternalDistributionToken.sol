@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract DummyInternalCirculationToken {
+contract DummyInternalDistributionToken {
     address public myAddress;
 
     constructor() public {}
