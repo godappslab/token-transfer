@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
 import "../transfer-history/TransferHistoryInterface.sol";
-import "../other-interface/InternalCirculationTokenInterface.sol";
+import "../other-interface/InternalDistributionTokenInterface.sol";
 import "../other-interface/ERC223ContractReceiverIF.sol";
 
 contract TokenTransfer {
@@ -19,7 +19,7 @@ contract TokenTransfer {
     address public ercToken;
 
     // Internal Token Contract Address
-    address public internalCirculationToken;
+    address public internalDistributionToken;
 
     // History Dapps Address
     address public transferHistory;
@@ -43,7 +43,7 @@ contract TokenTransfer {
         owner = msg.sender;
 
         ercToken = _ercToken;
-        internalCirculationToken = _internalCirculationToken;
+        internalDistributionToken = _internalCirculationToken;
         transferHistory = _transferHistory;
 
     }
@@ -83,12 +83,12 @@ contract TokenTransfer {
 
         // It must be a used signature in the internal circulation token
         require(
-            InternalCirculationTokenInterface(internalCirculationToken).isUsedSignature(_signature) == true,
+            InternalDistributionTokenInterface(internalDistributionToken).isUsedSignature(_signature) == true,
             "Must be a used signature in the internal circulation token"
         );
 
         // Recalculate hash value
-        bytes32 hashedTx = InternalCirculationTokenInterface(internalCirculationToken).requestTokenTransfer(_to, _value, _nonce);
+        bytes32 hashedTx = InternalDistributionTokenInterface(internalDistributionToken).requestTokenTransfer(_to, _value, _nonce);
 
         // Identify the requester's ETH Address
         address _user = hashedTx.recover(_signature);
@@ -104,7 +104,7 @@ contract TokenTransfer {
         // Not being transferred
         require(TransferHistoryInterface(transferHistory).isTokenTransferred(_signature) == false, "Already token remitted");
 
-        // InternalCirculationTokenInterface -> ERCToken
+        // InternalDistributionTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
 
         success = IERC20(ercToken).transfer(_to, ercTokenValue);
