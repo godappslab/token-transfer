@@ -1,5 +1,7 @@
 # Implementation for exchanging from Internal Distribution Token to ERC20/223 Token
 
+*Read this in other languages: [English](README.em.md), [日本語](README.ja.md).*
+
 It is under development.
 
 このリポジトリのソースコードは、現在開発段階のものです。
@@ -55,7 +57,7 @@ flowchart
 [Truffle Suite ](https://truffleframework.com/) を利用したテストスクリプトで動作確認を行う。
 
 ```bash
-$ truffle test 
+$ truffle test
 Using network 'test'.
 
 Compiling ./contracts/token-transfer/TokenTransfer.sol...
