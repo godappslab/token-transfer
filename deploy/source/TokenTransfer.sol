@@ -1,65 +1,89 @@
-pragma solidity >=0.4.24<0.6.0;
+pragma solidity ^0.5.0;
 
 /**
  * @title SafeMath
- * @dev Math operations with safety checks that throw on error
+ * @dev Unsigned math operations with safety checks that revert on error
  */
 library SafeMath {
+    /**
+    * @dev Multiplies two unsigned integers, reverts on overflow.
+    */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+        if (a == 0) {
+            return 0;
+        }
 
-  /**
-  * @dev Multiplies two numbers, throws on overflow.
-  */
-  function mul(uint256 _a, uint256 _b) internal pure returns (uint256 c) {
-    // Gas optimization: this is cheaper than asserting 'a' not being zero, but the
-    // benefit is lost if 'b' is also tested.
-    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
-    if (_a == 0) {
-      return 0;
+        uint256 c = a * b;
+        require(c / a == b);
+
+        return c;
     }
 
-    c = _a * _b;
-    assert(c / _a == _b);
-    return c;
-  }
+    /**
+    * @dev Integer division of two unsigned integers truncating the quotient, reverts on division by zero.
+    */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
-  /**
-  * @dev Integer division of two numbers, truncating the quotient.
-  */
-  function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    // assert(_b > 0); // Solidity automatically throws when dividing by 0
-    // uint256 c = _a / _b;
-    // assert(_a == _b * c + _a % _b); // There is no case in which this doesn't hold
-    return _a / _b;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
-    assert(_b <= _a);
-    return _a - _b;
-  }
+    /**
+    * @dev Subtracts two unsigned integers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+    */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a);
+        uint256 c = a - b;
 
-  /**
-  * @dev Adds two numbers, throws on overflow.
-  */
-  function add(uint256 _a, uint256 _b) internal pure returns (uint256 c) {
-    c = _a + _b;
-    assert(c >= _a);
-    return c;
-  }
+        return c;
+    }
+
+    /**
+    * @dev Adds two unsigned integers, reverts on overflow.
+    */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a);
+
+        return c;
+    }
+
+    /**
+    * @dev Divides two unsigned integers and returns the remainder (unsigned integer modulo),
+    * reverts when dividing by zero.
+    */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b != 0);
+        return a % b;
+    }
 }
 
 /**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * See https://github.com/ethereum/EIPs/issues/179
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract ERC20Basic {
-  function totalSupply() public view returns (uint256);
-  function balanceOf(address _who) public view returns (uint256);
-  function transfer(address _to, uint256 _value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
+interface IERC20 {
+    function transfer(address to, uint256 value) external returns (bool);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address who) external view returns (uint256);
+
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**
@@ -69,76 +93,64 @@ contract ERC20Basic {
  * See https://github.com/ethereum/solidity/issues/864
  */
 
-library ECRecovery {
+library ECDSA {
+    /**
+     * @dev Recover signer address from a message by using their signature
+     * @param hash bytes32 message, the hash is the signed message. What is recovered is the signer address.
+     * @param signature bytes signature, the signature is generated using web3.eth.sign()
+     */
+    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
 
-  /**
-   * @dev Recover signer address from a message by using their signature
-   * @param _hash bytes32 message, the hash is the signed message. What is recovered is the signer address.
-   * @param _sig bytes signature, the signature is generated using web3.eth.sign()
-   */
-  function recover(bytes32 _hash, bytes _sig)
-    internal
-    pure
-    returns (address)
-  {
-    bytes32 r;
-    bytes32 s;
-    uint8 v;
+        // Check the signature length
+        if (signature.length != 65) {
+            return (address(0));
+        }
 
-    // Check the signature length
-    if (_sig.length != 65) {
-      return (address(0));
+        // Divide the signature in r, s and v variables
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            r := mload(add(signature, 0x20))
+            s := mload(add(signature, 0x40))
+            v := byte(0, mload(add(signature, 0x60)))
+        }
+
+        // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
+        if (v < 27) {
+            v += 27;
+        }
+
+        // If the version is correct return the signer address
+        if (v != 27 && v != 28) {
+            return (address(0));
+        } else {
+            return ecrecover(hash, v, r, s);
+        }
     }
 
-    // Divide the signature in r, s and v variables
-    // ecrecover takes the signature parameters, and the only way to get them
-    // currently is to use assembly.
-    // solium-disable-next-line security/no-inline-assembly
-    assembly {
-      r := mload(add(_sig, 32))
-      s := mload(add(_sig, 64))
-      v := byte(0, mload(add(_sig, 96)))
+    /**
+     * toEthSignedMessageHash
+     * @dev prefix a bytes32 value with "\x19Ethereum Signed Message:"
+     * and hash the result
+     */
+    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+        // 32 is the length in bytes of hash,
+        // enforced by the type signature above
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
-
-    // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
-    if (v < 27) {
-      v += 27;
-    }
-
-    // If the version is correct return the signer address
-    if (v != 27 && v != 28) {
-      return (address(0));
-    } else {
-      // solium-disable-next-line arg-overflow
-      return ecrecover(_hash, v, r, s);
-    }
-  }
-
-  /**
-   * toEthSignedMessageHash
-   * @dev prefix a bytes32 value with "\x19Ethereum Signed Message:"
-   * and hash the result
-   */
-  function toEthSignedMessageHash(bytes32 _hash)
-    internal
-    pure
-    returns (bytes32)
-  {
-    // 32 is the length in bytes of hash,
-    // enforced by the type signature above
-    return keccak256(
-      abi.encodePacked("\x19Ethereum Signed Message:\n32", _hash)
-    );
-  }
 }
 
 interface TransferHistoryInterface {
-    function isTokenTransferred(bytes _signature) external view returns (bool);
-    function recordAsTokenTransferred(bytes _signature) external returns (bool);
+    function isTokenTransferred(bytes calldata _signature) external view returns (bool);
+    function recordAsTokenTransferred(bytes calldata _signature) external returns (bool);
     function updateTransferDappsAddress(address _newTransferDapps) external returns (bool);
 }
 
-interface InternalCirculationTokenInterface {
+interface InternalDistributionTokenInterface {
     // Required methods
 
     // @title Is the ETH address of the argument the distributor of the token?
@@ -162,7 +174,9 @@ interface InternalCirculationTokenInterface {
     // @param uint256 _value
     // @param string _nonce
     // @return bool
-    function acceptTokenTransfer(bytes _signature, address _requested_user, uint256 _value, string _nonce) external returns (bool success);
+    function acceptTokenTransfer(bytes calldata _signature, address _requested_user, uint256 _value, string calldata _nonce)
+        external
+        returns (bool success);
 
     // @title A function that generates a hash value of a request to which a user sends a token (executed by the user of the token)
     // @params _requested_user ETH address that requested token transfer
@@ -170,12 +184,12 @@ interface InternalCirculationTokenInterface {
     // @params _nonce One-time string
     // @return bytes32 Hash value
     // @dev The user signs the hash value obtained from this function and hands it over to the owner outside the system
-    function requestTokenTransfer(address _requested_user, uint256 _value, string _nonce) external view returns (bytes32);
+    function requestTokenTransfer(address _requested_user, uint256 _value, string calldata _nonce) external view returns (bytes32);
 
     // @title Returns whether it is a used signature
     // @params _signature Signature string
     // @return bool Used or not
-    function isUsedSignature(bytes _signature) external view returns (bool);
+    function isUsedSignature(bytes calldata _signature) external view returns (bool);
 
     // Events
 
@@ -197,13 +211,13 @@ interface InternalCirculationTokenInterface {
 
 /* https://github.com/Dexaran/ERC223-token-standard/blob/Recommended/Receiver_Interface.sol */
 interface ERC223ContractReceiverIF {
-    function tokenFallback(address _from, uint256 _value, bytes _data) external returns (bool);
+    function tokenFallback(address _from, uint256 _value, bytes calldata _data) external returns (bool);
 }
 
 contract TokenTransfer {
     // Load library
     using SafeMath for uint256;
-    using ECRecovery for bytes32;
+    using ECDSA for bytes32;
 
     address public owner;
 
@@ -211,7 +225,7 @@ contract TokenTransfer {
     address public ercToken;
 
     // Internal Token Contract Address
-    address public internalCirculationToken;
+    address public internalDistributionToken;
 
     // History Dapps Address
     address public transferHistory;
@@ -235,7 +249,7 @@ contract TokenTransfer {
         owner = msg.sender;
 
         ercToken = _ercToken;
-        internalCirculationToken = _internalCirculationToken;
+        internalDistributionToken = _internalCirculationToken;
         transferHistory = _transferHistory;
 
     }
@@ -251,7 +265,7 @@ contract TokenTransfer {
     // @params _from  Token sender address.
     // @params _value Amount of tokens.
     // @params _data  Transaction metadata.
-    function tokenFallback(address _from, uint256 _value, bytes _data) external view returns (bool) {
+    function tokenFallback(address _from, uint256 _value, bytes calldata _data) external view returns (bool) {
         // TokenTransfer receives only the specified ERC223 token
         require(msg.sender == ercToken);
 
@@ -270,17 +284,17 @@ contract TokenTransfer {
     // @params _to        Requester
     // @params _value     Amount of exchange (Internal Circulation Token)
     // @params _nonce     Nonce at the time of exchange
-    function transferToken(bytes _signature, address _to, uint256 _value, string _nonce) external onlyOwner returns (bool success) {
+    function transferToken(bytes calldata _signature, address _to, uint256 _value, string calldata _nonce) external onlyOwner returns (bool success) {
         // Verify signature
 
         // It must be a used signature in the internal circulation token
         require(
-            InternalCirculationTokenInterface(internalCirculationToken).isUsedSignature(_signature) == true,
+            InternalDistributionTokenInterface(internalDistributionToken).isUsedSignature(_signature) == true,
             "Must be a used signature in the internal circulation token"
         );
 
         // Recalculate hash value
-        bytes32 hashedTx = InternalCirculationTokenInterface(internalCirculationToken).requestTokenTransfer(_to, _value, _nonce);
+        bytes32 hashedTx = InternalDistributionTokenInterface(internalDistributionToken).requestTokenTransfer(_to, _value, _nonce);
 
         // Identify the requester's ETH Address
         address _user = hashedTx.recover(_signature);
@@ -296,10 +310,10 @@ contract TokenTransfer {
         // Not being transferred
         require(TransferHistoryInterface(transferHistory).isTokenTransferred(_signature) == false, "Already token remitted");
 
-        // InternalCirculationTokenInterface -> ERCToken
+        // InternalDistributionTokenInterface -> ERCToken
         uint256 ercTokenValue = _value.mul(exchangeLateToERCToken);
 
-        success = ERC20Basic(ercToken).transfer(_to, ercTokenValue);
+        success = IERC20(ercToken).transfer(_to, ercTokenValue);
 
         // record
         if (success) {
@@ -311,16 +325,9 @@ contract TokenTransfer {
 
     // @title Send all tokens to the owner
     function withdraw() external onlyOwner returns (bool success) {
-        uint256 balance = ERC20Basic(ercToken).balanceOf(address(this));
-        success = ERC20Basic(ercToken).transfer(owner, balance);
+        uint256 balance = IERC20(ercToken).balanceOf(address(this));
+        success = IERC20(ercToken).transfer(owner, balance);
         return success;
-    }
-
-    // ---------------------------------------------
-    // Destruction of a contract (only owner)
-    // ---------------------------------------------
-    function destory() public onlyOwner {
-        selfdestruct(owner);
     }
 
 }
